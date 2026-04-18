@@ -30,6 +30,48 @@ class DateTimeInput(forms.DateTimeInput):
     input_type = 'datetime-local'
 
 
+def apply_placeholders(form):
+    placeholder_map = {
+        'full_name': 'Enter full name',
+        'username': 'Enter username',
+        'email': 'Enter email address',
+        'phone': 'Enter phone number',
+        'headline': 'Enter professional headline',
+        'location': 'Enter location',
+        'bio': 'Write a short bio',
+        'company_name': 'Enter company name',
+        'job_title': 'Enter job title',
+        'portal_name': 'Enter portal name',
+        'application_url': 'Paste application URL',
+        'job_location': 'Enter job location',
+        'salary': 'Enter salary details',
+        'notes': 'Add notes',
+        'referral_name': 'Enter referral name',
+        'referral_contact': 'Enter referral contact',
+        'follow_up_email_draft': 'Write follow-up email draft',
+        'tags_input': 'Backend, Remote, Fintech',
+        'portal_email': 'Enter portal email',
+        'portal_user_id': 'Enter portal user ID',
+        'login_url': 'Paste login URL',
+        'password': 'Enter password',
+        'security_notes': 'Add security notes',
+        'title': 'Enter title',
+        'version_label': 'Enter version label',
+        'target_role': 'Enter target role',
+        'content': 'Write content',
+        'remind_at': 'Select reminder date and time',
+        'company_rating': '0 to 5',
+        'match_score': '0 to 100',
+        'otp_code': 'Enter 6-digit code',
+    }
+    skip_widgets = (forms.CheckboxInput, forms.Select, forms.SelectMultiple, forms.ClearableFileInput)
+    for name, field in form.fields.items():
+        if isinstance(field.widget, skip_widgets):
+            continue
+        fallback_label = (field.label or name.replace('_', ' ')).lower()
+        field.widget.attrs.setdefault('placeholder', placeholder_map.get(name, f'Enter {fallback_label}'))
+
+
 class RegisterForm(UserCreationForm):
     email = forms.EmailField()
     full_name = forms.CharField(max_length=180)
@@ -37,6 +79,10 @@ class RegisterForm(UserCreationForm):
     class Meta:
         model = User
         fields = ('username', 'full_name', 'email', 'password1', 'password2')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        apply_placeholders(self)
 
     def save(self, commit=True):
         user = super().save(commit=False)
@@ -52,6 +98,10 @@ class RegisterForm(UserCreationForm):
 
 class LoginWithOTPForm(AuthenticationForm):
     otp_code = forms.CharField(max_length=6, required=False, label='2FA Code')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        apply_placeholders(self)
 
     def clean(self):
         username = self.cleaned_data.get('username')
@@ -83,6 +133,7 @@ class ProfileForm(forms.ModelForm):
         self.user = kwargs.pop('user')
         super().__init__(*args, **kwargs)
         self.fields['email'].initial = self.user.email
+        apply_placeholders(self)
 
     def save(self, commit=True):
         profile = super().save(commit=False)
@@ -120,6 +171,7 @@ class ApplicationForm(forms.ModelForm):
         self.fields['application_url'].help_text = 'Use a full URL like https://company.com/jobs/123. If you omit the scheme, https:// will be added automatically.'
         if self.instance.pk:
             self.fields['tags_input'].initial = ', '.join(self.instance.tags.values_list('name', flat=True))
+        apply_placeholders(self)
 
     def clean_application_url(self):
         url = (self.cleaned_data.get('application_url') or '').strip()
@@ -157,6 +209,7 @@ class PortalCredentialForm(forms.ModelForm):
         self.fields['application'].queryset = self.user.applications.all()
         if self.instance.pk:
             self.fields['password'].initial = ''
+        apply_placeholders(self)
 
     def save(self, commit=True):
         credential = super().save(commit=False)
@@ -181,6 +234,7 @@ class ApplicationDocumentForm(forms.ModelForm):
         self.user = kwargs.pop('user')
         super().__init__(*args, **kwargs)
         self.fields['application'].queryset = self.user.applications.all()
+        apply_placeholders(self)
 
     def save(self, commit=True):
         document = super().save(commit=False)
@@ -201,6 +255,7 @@ class ReminderForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['application'].queryset = self.user.applications.all()
         self.fields['remind_at'].initial = timezone.now().replace(second=0, microsecond=0)
+        apply_placeholders(self)
 
     def save(self, commit=True):
         reminder = super().save(commit=False)
@@ -219,6 +274,7 @@ class TemplateForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user')
         super().__init__(*args, **kwargs)
+        apply_placeholders(self)
 
     def save(self, commit=True):
         template = super().save(commit=False)
@@ -233,6 +289,10 @@ class ChecklistItemForm(forms.ModelForm):
         model = ChecklistItem
         fields = ('title', 'is_done')
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        apply_placeholders(self)
+
 
 class InterviewNoteForm(forms.ModelForm):
     class Meta:
@@ -243,3 +303,7 @@ class InterviewNoteForm(forms.ModelForm):
             'question_type': forms.Select(attrs={'class': 'form-select'}),
             'difficulty': forms.Select(attrs={'class': 'form-select'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        apply_placeholders(self)
