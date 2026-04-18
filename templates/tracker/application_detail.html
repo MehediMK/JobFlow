@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+{% block page_title %}{{ application.company_name }}{% endblock %}
+{% block page_subtitle %}{{ application.job_title }}{% endblock %}
+{% block content %}
+<section class="detail-grid">
+    <div class="panel span-2">
+        <div class="panel-head">
+            <h3>Overview</h3>
+            <div class="action-row">
+                <a class="btn btn-secondary" href="{% url 'application_update' application.pk %}">Edit</a>
+                <a class="btn btn-secondary" href="{% url 'application_duplicate' application.pk %}">Duplicate</a>
+            </div>
+        </div>
+        <div class="key-grid">
+            <div><span>Portal</span><strong>{{ application.portal_name|default:"-" }}</strong></div>
+            <div><span>Status</span><strong>{{ application.get_status_display }}</strong></div>
+            <div><span>Location</span><strong>{{ application.job_location|default:"-" }}</strong></div>
+            <div><span>Employment</span><strong>{{ application.get_employment_type_display|default:"-" }}</strong></div>
+            <div><span>Salary</span><strong>{{ application.salary|default:"-" }}</strong></div>
+            <div><span>Priority</span><strong>{{ application.get_priority_display }}</strong></div>
+            <div><span>Deadline</span><strong>{{ application.deadline_date|default:"-" }}</strong></div>
+            <div><span>Interview</span><strong>{{ application.interview_date|default:"-" }}</strong></div>
+        </div>
+        <div class="note-block">
+            <h4>Notes</h4>
+            <p>{{ application.notes|default:"No notes added yet." }}</p>
+        </div>
+        <div class="note-block">
+            <h4>Follow-up Draft</h4>
+            <p>{{ application.follow_up_email_draft|default:"No follow-up draft saved." }}</p>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="panel-head">
+            <h3>Tags & Referral</h3>
+        </div>
+        <div class="tag-grid">
+            {% for tag in application.tags.all %}
+            <span class="chip">{{ tag.name }}</span>
+            {% empty %}
+            <span class="empty-state">No tags</span>
+            {% endfor %}
+        </div>
+        <p><strong>Referral:</strong> {{ application.referral_name|default:"-" }} {{ application.referral_contact|default:"" }}</p>
+        <p><strong>Company rating:</strong> {{ application.company_rating }}/5</p>
+        <p><strong>Resume match score:</strong> {{ application.match_score }}%</p>
+        <p><a href="{{ application.application_url }}" target="_blank" rel="noopener">Open job URL</a></p>
+    </div>
+
+    <div class="panel">
+        <div class="panel-head">
+            <h3>Credentials</h3>
+            <a href="{% url 'credential_create' %}">Add</a>
+        </div>
+        {% for credential, password in credential_values %}
+        <div class="list-row">
+            <div>
+                <strong>{{ credential.portal_name }}</strong>
+                <small>{{ credential.portal_email|default:credential.portal_user_id }}</small>
+            </div>
+            <span>{{ password|default:"Not set" }}</span>
+        </div>
+        {% empty %}
+        <p class="empty-state">No portal credentials linked.</p>
+        {% endfor %}
+    </div>
+
+    <div class="panel">
+        <div class="panel-head">
+            <h3>Documents</h3>
+            <a href="{% url 'document_create' %}">Upload</a>
+        </div>
+        {% for document in application.documents.all %}
+        <div class="list-row">
+            <div>
+                <strong>{{ document.title }}</strong>
+                <small>{{ document.get_document_type_display }}</small>
+            </div>
+            <a href="{{ document.file.url }}">View</a>
+        </div>
+        {% empty %}
+        <p class="empty-state">No documents uploaded for this application.</p>
+        {% endfor %}
+    </div>
+
+    <div class="panel">
+        <div class="panel-head">
+            <h3>Checklist</h3>
+            <a href="{% url 'add_checklist_item' application.pk %}">Add item</a>
+        </div>
+        {% for item in application.checklist_items.all %}
+        <div class="list-row">
+            <div>
+                <strong>{{ item.title }}</strong>
+            </div>
+            <span>{{ item.is_done|yesno:"Done,Pending" }}</span>
+        </div>
+        {% empty %}
+        <p class="empty-state">No checklist yet.</p>
+        {% endfor %}
+    </div>
+
+    <div class="panel">
+        <div class="panel-head">
+            <h3>Interview Preparation</h3>
+            <div class="action-row">
+                <a href="{% url 'add_interview_note' application.pk %}" class="btn btn-secondary">Add Question</a>
+                <a href="{% url 'interview_dashboard' application.pk %}" class="btn btn-primary">Practice Dashboard</a>
+            </div>
+        </div>
+        {% for note in application.interview_notes.all %}
+        <article class="note-block">
+            <div class="flex items-center justify-between mb-2">
+                <div>
+                    <h4>{{ note.title }}</h4>
+                    <div class="flex flex-wrap gap-2 mt-1">
+                        <span class="px-2 py-1 text-xs font-medium
+                              {% if note.question_type == 'behavioral' %}bg-blue-100 text-blue-800
+                              {% elif note.question_type == 'technical' %}bg-green-100 text-green-800
+                              {% elif note.question_type == 'situational' %}bg-purple-100 text-purple-800
+                              {% else %}bg-gray-100 text-gray-800{% endif %}">
+                            {{ note.get_question_type_display }}
+                        </span>
+                        <span class="px-2 py-1 text-xs font-medium
+                              {% if note.difficulty == 'easy' %}bg-green-100 text-green-800
+                              {% elif note.difficulty == 'medium' %}bg-yellow-100 text-yellow-800
+                              {% else %}bg-red-100 text-red-800{% endif %}">
+                            {{ note.get_difficulty_display }}
+                        </span>
+                        {% if note.is_practiced %}
+                        <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800">
+                            Practiced {{ note.practice_count }}x
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="text-right space-x-2">
+                    <a href="{% url 'interview_practice' note.pk %}" class="btn btn-outline btn-sm">Practice</a>
+                    <a href="{% url 'interview_note_edit' note.pk %}" class="btn btn-outline btn-sm btn-sm">Edit</a>
+                    <a href="{% url 'interview_note_delete' note.pk %}" class="btn btn-outline btn-sm btn-sm">Delete</a>
+                </div>
+            </div>
+            <p class="mt-2">{{ note.content|linebreaks }}</p>
+            {% if note.is_practiced and note.user_rating %}
+            <div class="mt-2 p-3 bg-gray-50 rounded">
+                <strong>Your Rating:</strong> {{ note.user_rating }}/5
+                {% if note.last_practiced %}
+                <br><small class="text-gray-500">Last practiced: {{ note.last_practiced|timesince }} ago</small>
+                {% endif %}
+            </div>
+            {% endif %}
+        </article>
+        {% empty %}
+        <div class="empty-state">
+            <h3>No interview preparation yet</h3>
+            <p class="mt-3">Start by adding common interview questions for this role. Practicing improves your chances of success!</p>
+            <a href="{% url 'add_interview_note' application.pk %}" class="btn btn-primary mt-4">Add First Question</a>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="panel">
+        <div class="panel-head">
+            <h3>Reminders</h3>
+            <a href="{% url 'reminder_create' %}">Add reminder</a>
+        </div>
+        {% for reminder in application.reminders.all %}
+        <div class="list-row">
+            <div>
+                <strong>{{ reminder.title }}</strong>
+                <small>{{ reminder.remind_at }}</small>
+            </div>
+            <span>{{ reminder.get_reminder_type_display }}</span>
+        </div>
+        {% empty %}
+        <p class="empty-state">No reminders yet.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

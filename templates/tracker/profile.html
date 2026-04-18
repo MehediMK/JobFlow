@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block page_title %}Profile & Security{% endblock %}
+{% block page_subtitle %}Manage account details, email verification, theme preference, and optional two-factor authentication.{% endblock %}
+{% block content %}
+<section class="detail-grid">
+    <div class="panel span-2">
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_div }}
+            <button class="btn btn-primary" type="submit">Save Profile</button>
+        </form>
+    </div>
+    <div class="panel">
+        <h3>Security</h3>
+        <p>Email verification: <strong>{{ request.user.profile.email_verified|yesno:"Verified,Pending" }}</strong></p>
+        <div class="action-row wrap">
+            <a class="btn btn-secondary" href="{% url 'send_verification_email' %}">Send Verification Email</a>
+            {% if request.user.profile.two_factor_enabled %}
+            <a class="btn btn-secondary" href="{% url 'disable_two_factor' %}">Disable 2FA</a>
+            {% else %}
+            <a class="btn btn-secondary" href="{% url 'two_factor_setup' %}">Enable 2FA</a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

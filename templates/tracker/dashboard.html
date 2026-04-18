@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+{% block page_title %}Dashboard{% endblock %}
+{% block page_subtitle %}A snapshot of your pipeline, deadlines, interviews, and next actions.{% endblock %}
+{% block content %}
+<section class="stats-grid">
+    <article class="stat-card"><span>Total</span><strong>{{ total_applications }}</strong></article>
+    <article class="stat-card"><span>Active</span><strong>{{ active_applications }}</strong></article>
+    <article class="stat-card"><span>Interviews This Week</span><strong>{{ interviews_this_week }}</strong></article>
+    <article class="stat-card"><span>Offers / Rejected</span><strong>{{ offered_count }} / {{ rejected_count }}</strong></article>
+    <article class="stat-card"><span>Interview Ready</span><strong>{{ interview_ready_count }}</strong></article>
+</section>
+
+<section class="content-grid">
+    <div class="panel">
+        <div class="panel-head">
+            <h3>Upcoming Deadlines</h3>
+            <a href="{% url 'application_list' %}">View all</a>
+        </div>
+        {% for item in upcoming_deadlines %}
+        <div class="list-row">
+            <div>
+                <strong>{{ item.company_name }}</strong>
+                <small>{{ item.job_title }}</small>
+            </div>
+            <span>{{ item.deadline_date }}</span>
+        </div>
+        {% empty %}
+        <p class="empty-state">No deadlines in the next 7 days.</p>
+        {% endfor %}
+    </div>
+
+    <div class="panel">
+        <div class="panel-head">
+            <h3>Needs Follow-up</h3>
+            <a href="{% url 'reminder_list' %}">Open reminders</a>
+        </div>
+        {% for item in needs_followup %}
+        <div class="list-row">
+            <div>
+                <strong>{{ item.company_name }}</strong>
+                <small>{{ item.follow_up_date }}</small>
+            </div>
+            <span class="badge">{{ item.get_status_display }}</span>
+        </div>
+        {% empty %}
+        <p class="empty-state">No follow-up pressure right now.</p>
+        {% endfor %}
+    </div>
+
+    <div class="panel">
+        <div class="panel-head">
+            <h3>Recent Activity</h3>
+            <a href="{% url 'application_create' %}">Add new</a>
+        </div>
+        {% for item in recent_activity %}
+        <div class="activity-row">
+            <strong>{{ item.action }}</strong>
+            <small>{{ item.description|default:item.application }}</small>
+        </div>
+        {% empty %}
+        <p class="empty-state">Your latest actions will appear here.</p>
+        {% endfor %}
+    </div>
+
+    <div class="panel">
+        <div class="panel-head">
+            <h3>Urgent Reminders</h3>
+            <a href="{% url 'reminder_create' %}">Create reminder</a>
+        </div>
+        {% for reminder in urgent_reminders %}
+        <div class="list-row">
+            <div>
+                <strong>{{ reminder.title }}</strong>
+                <small>{{ reminder.remind_at }}</small>
+            </div>
+            <a href="{% url 'reminder_toggle' reminder.pk %}">{{ reminder.is_completed|yesno:"Reopen,Done" }}</a>
+        </div>
+        {% empty %}
+        <p class="empty-state">Nothing urgent in the next 3 days.</p>
+        {% endfor %}
+    </div>
+
+    <!-- Enhanced Analytics Section -->
+    <div class="panel span-2">
+        <div class="panel-head">
+            <h3>Application Funnel</h3>
+            <a href="{% url 'application_list' %}">View all</a>
+        </div>
+        <div id="funnel-chart" class="chart-container" data-chart='{{ funnel_data|escapejs }}'></div>
+        <div class="mt-3 text-sm text-gray-500">
+            <div class="flex justify-between">
+                <span>Applied → Interview: {{ funnel_conversion_rate }}%</span>
+                <span>Interview → Offer: {{ offer_rate }}%</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel span-2">
+        <div class="panel-head">
+            <h3>Interview Preparation</h3>
+            <a href="{% url 'interview_list' %}">View all</a>
+        </div>
+        <div class="space-y-3">
+            <div class="flex items-center justify-between">
+                <span class="font-medium">Questions Practiced</span>
+                <span class="font-bold">{{ practiced_questions }}/{{ total_interview_questions }}</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                <div class="bg-blue-600 h-2.5 rounded-full"
+                     style="width: {{ practice_percentage }}%"></div>
+            </div>
+            <div class="flex justify-between text-xs text-gray-500 mt-1">
+                <span>{{ practice_percentage }}% complete</span>
+                <span>{{ avg_practice_rating }}/5 avg rating</span>
+            </div>
+        </div>
+        {% if total_interview_questions > 0 %}
+        <div class="mt-2 text-center">
+            <a href="{% url 'interview_list' %}" class="btn btn-outline btn-sm w-full">
+                Practice Interview Questions
+            </a>
+        </div>
+        {% else %}
+        <div class="mt-2 text-center text-gray-500">
+            No interview questions added yet. Start preparing!
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="panel span-2">
+        <div class="panel-head">
+            <h3>Application Status Pipeline</h3>
+            <a href="{% url 'application_kanban' %}">Open kanban</a>
+        </div>
+        <div id="status-chart" class="bar-chart" data-chart='{{ status_chart|escapejs }}'></div>
+    </div>
+
+    <div class="panel span-2">
+        <div class="panel-head">
+            <h3>Portal Performance</h3>
+            <a href="{% url 'export_excel' %}">Export XLSX</a>
+        </div>
+        <div id="portal-chart" class="bar-chart compact" data-chart='{{ portal_chart|escapejs }}'></div>
+    </div>
+
+    <div class="panel span-2">
+        <div class="panel-head">
+            <h3>Bookmarked Jobs</h3>
+            <a href="{% url 'application_list' %}?status=planning">Planning view</a>
+        </div>
+        <div class="tag-grid">
+            {% for item in bookmarked_jobs %}
+            <a href="{{ item.get_absolute_url }}" class="bookmark-card">
+                <strong>{{ item.company_name }}</strong>
+                <small>{{ item.job_title }}</small>
+            </a>
+            {% empty %}
+            <p class="empty-state">Use bookmarks to save roles before applying.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

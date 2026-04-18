@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% block title %}JobFlow Pro — Candidate Application Tracker{% endblock %}
+{% block meta_description %}Track every job application from draft to offer. Manage credentials, documents, reminders, and analytics in one focused workflow.{% endblock %}
+{% block content %}
+<div class="landing-wrapper">
+
+    {# ── Nav bar ── #}
+    <nav class="landing-nav" aria-label="Site navigation">
+        <a href="/" style="display:flex;align-items:center;gap:.75rem;text-decoration:none;">
+            <span class="logo-mark">JF</span>
+            <span style="font-family:var(--font-head);font-weight:700;font-size:1rem;color:var(--text);">JobFlow Pro</span>
+        </a>
+        <div class="action-row">
+            <a class="btn btn-secondary btn-sm" href="{% url 'login' %}">Sign In</a>
+            <a class="btn btn-primary  btn-sm" href="{% url 'register' %}">Get Started Free</a>
+        </div>
+    </nav>
+
+    {# ── Hero ── #}
+    <div class="landing-hero">
+        {# Left: copy #}
+        <div>
+            <span class="landing-eyebrow">Built for active job hunting</span>
+            <h1 class="landing-h1">
+                Track every application from
+                <span>draft&nbsp;to offer.</span>
+            </h1>
+            <p class="landing-desc">
+                Manage portal logins securely, upload CVs and cover letters, schedule follow-up reminders,
+                organise interview notes, and export your pipeline whenever needed — all in one focused workspace.
+            </p>
+            <div class="action-row" style="margin-bottom:2rem;">
+                <a class="btn btn-primary"    href="{% url 'register' %}">Create Free Account</a>
+                <a class="btn btn-secondary"  href="{% url 'login' %}">Sign In</a>
+            </div>
+
+            {# Trust badges #}
+            <div style="display:flex;gap:1.5rem;flex-wrap:wrap;">
+                <span style="font-size:.75rem;color:var(--text-3);display:flex;align-items:center;gap:.35rem;">
+                    🔒 Encrypted credentials
+                </span>
+                <span style="font-size:.75rem;color:var(--text-3);display:flex;align-items:center;gap:.35rem;">
+                    📊 Built-in analytics
+                </span>
+                <span style="font-size:.75rem;color:var(--text-3);display:flex;align-items:center;gap:.35rem;">
+                    📥 PDF / XLSX export
+                </span>
+            </div>
+        </div>
+
+        {# Right: feature cards #}
+        <div class="feature-stack">
+            <div class="feature-card">
+                <strong>🗂️ More than a tracker</strong>
+                <p>Kanban board, calendar timeline, reusable templates, encrypted credentials, PDF/XLSX export, interview notes, and follow-up reminders.</p>
+            </div>
+            <div class="feature-card">
+                <strong>⚡ Premium touches included</strong>
+                <p>Bookmark jobs before applying, duplicate old applications, score resume match fit, rate companies, and keep a per-role checklist.</p>
+            </div>
+            <div class="feature-card">
+                <strong>🔐 Two-factor authentication</strong>
+                <p>Protect your workspace with optional TOTP-based 2FA — your data stays yours and secured at rest.</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

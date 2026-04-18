@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block page_title %}Calendar View{% endblock %}
+{% block page_subtitle %}Dates that matter: deadlines, interviews, and follow-ups.{% endblock %}
+{% block content %}
+<section class="panel">
+    <div class="calendar-list">
+        {% for app in applications %}
+        <article class="calendar-card">
+            <h3>{{ app.company_name }}</h3>
+            <p>{{ app.job_title }}</p>
+            <ul>
+                {% if app.deadline_date %}<li>Deadline: {{ app.deadline_date }}</li>{% endif %}
+                {% if app.follow_up_date %}<li>Follow-up: {{ app.follow_up_date }}</li>{% endif %}
+                {% if app.interview_date %}<li>Interview: {{ app.interview_date }}</li>{% endif %}
+            </ul>
+        </article>
+        {% empty %}
+        <p class="empty-state">Add dates to applications and they will appear here.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

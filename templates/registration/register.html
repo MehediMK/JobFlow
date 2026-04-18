@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block page_title %}Create Account{% endblock %}
+{% block page_subtitle %}Start tracking applications, deadlines, follow-ups, and documents from one dashboard.{% endblock %}
+{% block content %}
+<section class="auth-wrapper">
+    <div class="auth-card auth-panel">
+        <div class="auth-logo">
+            <span class="logo-mark">JF</span>
+            <div class="auth-logo-text">
+                <strong>JobFlow Pro</strong>
+                <small>Candidate workspace</small>
+            </div>
+        </div>
+        <h2 class="auth-heading">Create Account</h2>
+        <p class="auth-sub">Start tracking applications, reminders, interviews, and documents from one dashboard.</p>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_div }}
+            <button class="btn btn-primary" type="submit">Register</button>
+        </form>
+        <div class="auth-links">
+            <a href="{% url 'login' %}">Already have an account?</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

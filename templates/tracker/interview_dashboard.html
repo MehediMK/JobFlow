@@ -1,0 +1,218 @@
+{% extends "tracker/base.html" %}
+{% block meta_description %}Interview preparation dashboard for {{ application.company_name }} - {{ application.job_title }} - JobFlow Pro{% endblock %}
+{% block page_title %}Interview Preparation{% endblock %}
+{% block page_subtitle %}{{ application.company_name }} - {{ application.job_title }}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Header -->
+    <div class="mb-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">Interview Preparation Dashboard</h1>
+                <p class="text-sm text-gray-500">
+                    {{ application.company_name }} - {{ application.job_title }}
+                </p>
+            </div>
+            <div class="flex items-center gap-3">
+                <a href="{% url 'application_detail' application.pk %}"
+                   class="btn btn-outline btn-sm">
+                    ← Back to Application
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Overview -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <!-- Total Questions -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500 mb-1">Total Questions</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ total_questions }}</p>
+                </div>
+                <div class="text-gray-400">
+                    ❓
+                </div>
+            </div>
+        </div>
+
+        <!-- Practiced Questions -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500 mb-1">Questions Practiced</p>
+                    <p class="text-2xl font-bold
+                       {% if practice_percentage >= 80 %}text-green-600
+                       {% elif practice_percentage >= 50 %}text-yellow-600
+                       {% else %}text-red-600{% endif %}">
+                        {{ practiced_questions }}/{{ total_questions }}
+                    </p>
+                </div>
+                <div class="text-gray-400">
+                    ✅
+                </div>
+            </div>
+            <div class="mt-2">
+                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                    <div class="bg-blue-600 h-2.5 rounded-full"
+                         style="width: {{ practice_percentage }}%"></div>
+                </div>
+                <p class="text-xs text-gray-500 mt-1">{{ practice_percentage }}% complete</p>
+            </div>
+        </div>
+
+        <!-- Average Rating -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500 mb-1">Average Rating</p>
+                    <p class="text-2xl font-bold
+                       {% if avg_rating >= 4 %}text-green-600
+                       {% elif avg_rating >= 3 %}text-yellow-600
+                       {% else %}text-red-600{% endif %}">
+                        {{ avg_rating }}/5
+                    </p>
+                </div>
+                <div class="text-gray-400">
+                    ⭐
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Question Type Breakdown -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 mb-6">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-lg font-semibold text-gray-900">Question Types</h2>
+        </div>
+        <div class="p-6">
+            {% if question_type_breakdown|length > 0 %}
+            <div class="space-y-4">
+                {% for item in question_type_breakdown %}
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded">
+                    <div>
+                        <span class="font-medium text-gray-800">
+                            {{ item.question_type|title }}
+                        </span>
+                        <p class="text-sm text-gray-500 mt-1">
+                            {{ item.count }} question{{ item.count|pluralize }}
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="w-20 bg-gray-200 rounded-full h-2.5">
+                            <div class="bg-blue-600 h-2.5 rounded-full"
+                                 style="width: {{ item.count|mul:100|div:total_questions }}%"></div>
+                        </div>
+                        <span class="text-sm font-medium text-gray-600">
+                            {{ item.count|mul:100|div:total_questions|floatformat:1 }}%
+                        </span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-8">
+                <p class="text-gray-500">No questions added yet. Start by adding interview questions!</p>
+                <a href="{% url 'add_interview_note' application.pk %}"
+                   class="btn btn-primary mt-4">
+                    Add First Question
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Recent Questions -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-lg font-semibold text-gray-900">Recent Questions</h2>
+        </div>
+        <div class="p-6">
+            {% if interview_notes %}
+            <div class="space-y-4">
+                {% for note in interview_notes|slice:":5" %}
+                <div class="flex items-start justify-between p-4 bg-gray-50 rounded">
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center mb-2">
+                            <h3 class="text-lg font-medium text-gray-900 flex-1">{{ note.title }}</h3>
+                            <div class="flex items-center gap-2 ml-3">
+                                <span class="px-2 py-1 text-xs font-medium
+                                      {% if note.question_type == 'behavioral' %}bg-blue-100 text-blue-800
+                                      {% elif note.question_type == 'technical' %}bg-green-100 text-green-800
+                                      {% elif note.question_type == 'situational' %}bg-purple-100 text-purple-800
+                                      {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                    {{ note.get_question_type_display }}
+                                </span>
+                                <span class="px-2 py-1 text-xs font-medium
+                                      {% if note.difficulty == 'easy' %}bg-green-100 text-green-800
+                                      {% elif note.difficulty == 'medium' %}bg-yellow-100 text-yellow-800
+                                      {% else %}bg-red-100 text-red-800{% endif %}">
+                                    {{ note.get_difficulty_display }}
+                                </span>
+                            </div>
+                        </div>
+                        <p class="text-gray-700 text-sm mb-2 line-clamp-2">
+                            {{ note.content|truncatewords:20 }}
+                        </p>
+                        <div class="text-xs text-gray-500 flex items-center gap-3">
+                            {% if note.is_practiced %}
+                            <span>✅ Practiced {{ note.practice_count }}x</span>
+                            {% else %}
+                            <span>⏳ Not practiced</span>
+                            {% endif %}
+                            {% if note.user_rating %}
+                            <span>⭐ {{ note.user_rating }}/5</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="text-right space-x-2">
+                        <a href="{% url 'interview_practice' note.pk %}"
+                           class="btn btn-outline btn-sm btn-sm">
+                            Practice
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+
+                {% if interview_notes|length > 5 %}
+                <div class="text-center py-4">
+                    <a href="{% url 'application_detail' application.pk %}#interview-notes"
+                       class="text-sm text-blue-600 hover:text-blue-800">
+                        View all {{ interview_notes|length }} questions →
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+            {% else %}
+            <div class="text-center py-8">
+                <div class="flex flex-col items-center gap-3">
+                    <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M9 12h6m-6 0l3-3m-3 3l3 3"/>
+                    </svg>
+                    <p class="text-gray-500">No interview questions added yet</p>
+                    <p class="text-sm text-gray-400">
+                        Add questions to start preparing for your interview
+                    </p>
+                    <a href="{% url 'add_interview_note' application.pk %}"
+                       class="btn btn-primary">
+                        Add First Question
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Any interactive JS for the dashboard can go here
+    console.log('Interview dashboard loaded');
+});
+</script>
+{% endblock %}

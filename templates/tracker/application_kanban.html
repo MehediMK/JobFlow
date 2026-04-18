@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block page_title %}Kanban Board{% endblock %}
+{% block page_subtitle %}Move mentally through the pipeline without losing the details behind each role.{% endblock %}
+{% block content %}
+<section class="kanban-board">
+    {% for column in columns %}
+    <div class="kanban-column">
+        <div class="panel-head">
+            <h3>{{ column.label }}</h3>
+            <span>{{ column.applications|length }}</span>
+        </div>
+        {% for app in column.applications %}
+        <a class="kanban-card" href="{{ app.get_absolute_url }}">
+            <strong>{{ app.company_name }}</strong>
+            <small>{{ app.job_title }}</small>
+            <span>{{ app.get_priority_display }}</span>
+        </a>
+        {% empty %}
+        <div class="kanban-empty">No items</div>
+        {% endfor %}
+    </div>
+    {% endfor %}
+</section>
+{% endblock %}

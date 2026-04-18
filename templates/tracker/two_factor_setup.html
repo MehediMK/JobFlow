@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block page_title %}Enable Two-Factor Authentication{% endblock %}
+{% block page_subtitle %}Use the shared secret in any TOTP authenticator app, then confirm with a fresh 6-digit code.{% endblock %}
+{% block content %}
+<section class="panel">
+    <p><strong>Secret:</strong> <code>{{ secret }}</code></p>
+    <form method="post" class="inline-form">
+        {% csrf_token %}
+        <input type="text" name="otp_code" maxlength="6" placeholder="Enter 6-digit code">
+        <button class="btn btn-primary" type="submit">Verify and Enable</button>
+    </form>
+</section>
+{% endblock %}

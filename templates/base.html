@@ -1,0 +1,114 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{% block meta_description %}JobFlow Pro - Track every job application, manage credentials, documents, reminders, and analytics in one focused workflow.{% endblock %}">
+    <title>{% block title %}{% block page_title %}JobFlow Pro{% endblock %} - JobFlow Pro{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/app.css' %}">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+<div class="page-shell {% if not request.user.is_authenticated %}no-sidebar{% endif %}" id="page-shell">
+    {% if request.user.is_authenticated %}
+    <div class="sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>
+
+    <aside class="sidebar" id="sidebar" role="navigation" aria-label="Main navigation">
+        <a class="sidebar-logo" href="{% url 'dashboard' %}" aria-label="JobFlow Pro home">
+            <span class="logo-mark" aria-hidden="true">JF</span>
+            <span class="logo-text">
+                <strong>JobFlow Pro</strong>
+                <small>Application command center</small>
+            </span>
+        </a>
+
+        <span class="sidebar-section-label">Main Menu</span>
+        <nav class="nav-links">
+            <a href="{% url 'dashboard' %}" class="{% if request.resolver_match and request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                <span class="nav-icon" aria-hidden="true">Dashboard</span>
+            </a>
+            <a href="{% url 'application_list' %}" class="{% if request.resolver_match and 'application' in request.resolver_match.url_name %}active{% endif %}">
+                <span class="nav-icon" aria-hidden="true">Applications</span>
+            </a>
+            <a href="{% url 'application_kanban' %}">
+                <span class="nav-icon" aria-hidden="true">Kanban</span>
+            </a>
+            <a href="{% url 'application_calendar' %}">
+                <span class="nav-icon" aria-hidden="true">Calendar</span>
+            </a>
+        </nav>
+
+        <span class="sidebar-section-label">Resources</span>
+        <nav class="nav-links">
+            <a href="{% url 'credential_list' %}">
+                <span class="nav-icon" aria-hidden="true">Credentials</span>
+            </a>
+            <a href="{% url 'document_list' %}">
+                <span class="nav-icon" aria-hidden="true">Documents</span>
+            </a>
+            <a href="{% url 'template_list' %}">
+                <span class="nav-icon" aria-hidden="true">Templates</span>
+            </a>
+            <a href="{% url 'reminder_list' %}">
+                <span class="nav-icon" aria-hidden="true">Reminders</span>
+            </a>
+        </nav>
+
+        <span class="sidebar-section-label">Account</span>
+        <nav class="nav-links">
+            <a href="{% url 'profile' %}">
+                <span class="nav-icon" aria-hidden="true">Profile</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-foot">
+            <a href="{% url 'logout' %}" aria-label="Sign out">
+                <span class="nav-icon" aria-hidden="true">Sign Out</span>
+            </a>
+        </div>
+    </aside>
+    {% endif %}
+
+    <div class="main-panel">
+        {% if request.user.is_authenticated %}
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="hamburger" id="hamburger-btn" aria-label="Toggle navigation" aria-expanded="false" aria-controls="sidebar">
+                    Menu
+                </button>
+                <div>
+                    <div class="topbar-title">{% block page_title_repeat %}{% endblock %}</div>
+                    <div class="topbar-sub">{% block page_subtitle %}Stay on top of every application, document, deadline, and follow-up.{% endblock %}</div>
+                </div>
+            </div>
+            <div class="topbar-right">
+                {% block topbar_actions %}
+                <a class="btn btn-secondary btn-sm" href="{% url 'application_create' %}">+ Application</a>
+                <a class="btn btn-primary btn-sm" href="{% url 'reminder_create' %}">+ Reminder</a>
+                {% endblock %}
+            </div>
+        </header>
+        {% endif %}
+
+        <main class="{% if request.user.is_authenticated %}page-content{% endif %}" role="main">
+            {% if messages %}
+            <div class="messages{% if not request.user.is_authenticated %} guest-messages{% endif %}" role="alert" aria-live="polite">
+                {% for message in messages %}
+                <div class="message {{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+</div>
+
+<script src="{% static 'js/app.js' %}"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block page_title %}Interview Questions{% endblock %}
+{% block page_subtitle %}Review and practice your saved interview questions across all applications.{% endblock %}
+{% block content %}
+<section class="content-grid">
+    <div class="panel span-2">
+        <div class="panel-head">
+            <h3>All Interview Questions</h3>
+            <a href="{% url 'application_list' %}">Open applications</a>
+        </div>
+        {% for note in interview_notes %}
+        <article class="list-row">
+            <div>
+                <strong>{{ note.title }}</strong>
+                <small>{{ note.application.company_name }} - {{ note.application.job_title }}</small>
+                <small>{{ note.get_question_type_display }} | {{ note.get_difficulty_display }}</small>
+            </div>
+            <div class="action-row">
+                <a href="{% url 'interview_practice' note.application.pk note.pk %}">Practice</a>
+                <a href="{% url 'application_detail' note.application.pk %}">Open application</a>
+            </div>
+        </article>
+        {% empty %}
+        <p class="empty-state">No interview questions added yet.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

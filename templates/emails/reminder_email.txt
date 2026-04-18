@@ -1,0 +1,6 @@
+Reminder: {{ reminder.title }}
+
+Application: {{ reminder.application|default:"General reminder" }}
+Scheduled for: {{ reminder.remind_at }}
+
+{{ reminder.notes|default:"Open JobFlow Pro to review the related application and next steps." }}

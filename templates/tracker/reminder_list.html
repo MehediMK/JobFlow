@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block page_title %}Reminders{% endblock %}
+{% block page_subtitle %}Track deadline alerts, follow-ups, interview prep, and document expiry reminders.{% endblock %}
+{% block content %}
+<section class="table-panel">
+    <div class="action-row">
+        <a class="btn btn-primary" href="{% url 'reminder_create' %}">New Reminder</a>
+    </div>
+    <div class="data-table">
+        <div class="table-head">
+            <span>Title</span>
+            <span>Type</span>
+            <span>Application</span>
+            <span>When</span>
+            <span>Status</span>
+            <span>Actions</span>
+        </div>
+        {% for reminder in reminders %}
+        <div class="table-row">
+            <div><strong>{{ reminder.title }}</strong><small>{{ reminder.notes|truncatechars:80 }}</small></div>
+            <div>{{ reminder.get_reminder_type_display }}</div>
+            <div>{{ reminder.application|default:"General" }}</div>
+            <div>{{ reminder.remind_at }}</div>
+            <div>{{ reminder.is_completed|yesno:"Completed,Pending" }}</div>
+            <div class="table-actions">
+                <a href="{% url 'reminder_update' reminder.pk %}">Edit</a>
+                <a href="{% url 'reminder_toggle' reminder.pk %}">{{ reminder.is_completed|yesno:"Reopen,Complete" }}</a>
+            </div>
+        </div>
+        {% empty %}
+        <p class="empty-state">No reminders yet.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

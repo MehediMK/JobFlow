@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% block page_title %}Applications{% endblock %}
+{% block page_subtitle %}Search, filter, export, and manage the full application pipeline.{% endblock %}
+{% block content %}
+<section class="panel">
+    <form method="get" class="filter-grid">
+        <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Search company, role, portal, location">
+        <select name="status">
+            <option value="">All statuses</option>
+            {% for value, label in status_choices %}
+            <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+        <select name="priority">
+            <option value="">All priorities</option>
+            {% for value, label in priority_choices %}
+            <option value="{{ value }}" {% if request.GET.priority == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+        <input type="text" name="tag" value="{{ request.GET.tag }}" placeholder="Tag">
+        <button class="btn btn-primary" type="submit">Filter</button>
+    </form>
+    <div class="action-row wrap">
+        <a class="btn btn-secondary" href="{% url 'export_csv' %}">CSV</a>
+        <a class="btn btn-secondary" href="{% url 'export_excel' %}">Excel</a>
+        <a class="btn btn-secondary" href="{% url 'export_pdf' %}">PDF</a>
+        <a class="btn btn-secondary" href="{% url 'application_calendar' %}">Calendar</a>
+        <a class="btn btn-secondary" href="{% url 'application_kanban' %}">Kanban</a>
+    </div>
+</section>
+
+<section class="table-panel">
+    <div class="data-table">
+        <div class="table-head">
+            <span>Company / Role</span>
+            <span>Portal</span>
+            <span>Status</span>
+            <span>Dates</span>
+            <span>Priority</span>
+            <span>Actions</span>
+        </div>
+        {% for app in applications %}
+        <div class="table-row">
+            <div>
+                <strong>{{ app.company_name }}</strong>
+                <small>{{ app.job_title }}</small>
+            </div>
+            <div>
+                <strong>{{ app.portal_name|default:"-" }}</strong>
+                <small>{{ app.job_location|default:"No location" }}</small>
+            </div>
+            <div>
+                <span class="badge">{{ app.get_status_display }}</span>
+                <small>Match {{ app.match_score }}%</small>
+            </div>
+            <div>
+                <strong>Deadline: {{ app.deadline_date|default:"-" }}</strong>
+                <small>Follow-up: {{ app.follow_up_date|default:"-" }}</small>
+            </div>
+            <div>
+                <strong>{{ app.get_priority_display }}</strong>
+                <small>Rating {{ app.company_rating }}/5</small>
+            </div>
+            <div class="table-actions">
+                <a href="{{ app.get_absolute_url }}">Open</a>
+                <a href="{% url 'application_update' app.pk %}">Edit</a>
+                <a href="{% url 'application_duplicate' app.pk %}">Duplicate</a>
+            </div>
+        </div>
+        {% empty %}
+        <p class="empty-state">No applications match the current filters.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

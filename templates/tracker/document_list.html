@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block page_title %}Documents{% endblock %}
+{% block page_subtitle %}Keep resumes, cover letters, certificates, and interview files organized by application.{% endblock %}
+{% block content %}
+<section class="table-panel">
+    <div class="action-row">
+        <a class="btn btn-primary" href="{% url 'document_create' %}">Upload File</a>
+    </div>
+    <div class="data-table">
+        <div class="table-head">
+            <span>Title</span>
+            <span>Type</span>
+            <span>Application</span>
+            <span>Expiry</span>
+            <span>Actions</span>
+        </div>
+        {% for document in documents %}
+        <div class="table-row">
+            <div><strong>{{ document.title }}</strong><small>{{ document.version_label }}</small></div>
+            <div>{{ document.get_document_type_display }}</div>
+            <div>{{ document.application }}</div>
+            <div>{{ document.expiry_date|default:"-" }}</div>
+            <div class="table-actions"><a href="{{ document.file.url }}">View</a><a href="{% url 'document_update' document.pk %}">Edit</a></div>
+        </div>
+        {% empty %}
+        <p class="empty-state">No documents uploaded yet.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

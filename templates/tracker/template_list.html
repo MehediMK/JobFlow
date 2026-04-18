@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block page_title %}Reusable Templates{% endblock %}
+{% block page_subtitle %}Store resume variants and cover letter templates so applications move faster.{% endblock %}
+{% block content %}
+<section class="panel">
+    <div class="action-row">
+        <a class="btn btn-primary" href="{% url 'template_create' %}">Create Template</a>
+    </div>
+    <div class="template-grid">
+        {% for template in templates %}
+        <article class="metric-card">
+            <strong>{{ template.title }}</strong>
+            <small>{{ template.get_template_type_display }}{% if template.target_role %} for {{ template.target_role }}{% endif %}</small>
+            <p>{{ template.content|truncatechars:180|default:"Attachment-based template" }}</p>
+            <a href="{% url 'template_update' template.pk %}">Edit</a>
+        </article>
+        {% empty %}
+        <p class="empty-state">No reusable templates saved.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}
