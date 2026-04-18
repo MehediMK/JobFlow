@@ -87,8 +87,8 @@
             <a href="{% url 'application_list' %}">View all</a>
         </div>
         <div id="funnel-chart" class="chart-container" data-chart='{{ funnel_data|escapejs }}'></div>
-        <div class="mt-3 text-sm text-gray-500">
-            <div class="flex justify-between">
+        <div class="dashboard-meta-row">
+            <div class="dashboard-meta-split">
                 <span>Applied → Interview: {{ funnel_conversion_rate }}%</span>
                 <span>Interview → Offer: {{ offer_rate }}%</span>
             </div>
@@ -100,28 +100,28 @@
             <h3>Interview Preparation</h3>
             <a href="{% url 'interview_list' %}">View all</a>
         </div>
-        <div class="space-y-3">
-            <div class="flex items-center justify-between">
-                <span class="font-medium">Questions Practiced</span>
-                <span class="font-bold">{{ practiced_questions }}/{{ total_interview_questions }}</span>
+        <div class="dashboard-stack">
+            <div class="dashboard-meta-split">
+                <span class="dashboard-strong">Questions Practiced</span>
+                <span class="dashboard-strong">{{ practiced_questions }}/{{ total_interview_questions }}</span>
             </div>
-            <div class="w-full bg-gray-200 rounded-full h-2.5">
-                <div class="bg-blue-600 h-2.5 rounded-full"
+            <div class="dashboard-progress-track">
+                <div class="dashboard-progress-fill"
                      style="width: {{ practice_percentage }}%"></div>
             </div>
-            <div class="flex justify-between text-xs text-gray-500 mt-1">
+            <div class="dashboard-meta-split dashboard-meta-small">
                 <span>{{ practice_percentage }}% complete</span>
                 <span>{{ avg_practice_rating }}/5 avg rating</span>
             </div>
         </div>
         {% if total_interview_questions > 0 %}
-        <div class="mt-2 text-center">
-            <a href="{% url 'interview_list' %}" class="btn btn-outline btn-sm w-full">
+        <div class="dashboard-center-row">
+            <a href="{% url 'interview_list' %}" class="btn btn-outline btn-sm dashboard-full-button">
                 Practice Interview Questions
             </a>
         </div>
         {% else %}
-        <div class="mt-2 text-center text-gray-500">
+        <div class="dashboard-empty-note">
             No interview questions added yet. Start preparing!
         </div>
         {% endif %}
