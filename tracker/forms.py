@@ -2,6 +2,7 @@ import re
 
 from django import forms
 from django.contrib.auth import authenticate, get_user_model
+from django.core.validators import URLValidator
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.core.exceptions import ValidationError
 from django.utils import timezone
@@ -95,6 +96,7 @@ class ProfileForm(forms.ModelForm):
 
 class ApplicationForm(forms.ModelForm):
     tags_input = forms.CharField(required=False, help_text='Comma separated tags like Backend, Remote, Fintech')
+    application_url = forms.CharField(required=False)
 
     class Meta:
         model = Application
@@ -115,8 +117,17 @@ class ApplicationForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['company_rating'].required = False
         self.fields['match_score'].required = False
+        self.fields['application_url'].help_text = 'Use a full URL like https://company.com/jobs/123. If you omit the scheme, https:// will be added automatically.'
         if self.instance.pk:
             self.fields['tags_input'].initial = ', '.join(self.instance.tags.values_list('name', flat=True))
+
+    def clean_application_url(self):
+        url = (self.cleaned_data.get('application_url') or '').strip()
+        if url and '://' not in url:
+            url = f'https://{url}'
+        if url:
+            URLValidator()(url)
+        return url
 
     def save(self, commit=True):
         application = super().save(commit=False)

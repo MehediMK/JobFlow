@@ -1,4 +1,4 @@
-{% extends "tracker/base.html" %}
+{% extends "base.html" %}
 {% block meta_description %}Interview preparation dashboard for {{ application.company_name }} - {{ application.job_title }} - JobFlow Pro{% endblock %}
 {% block page_title %}Interview Preparation{% endblock %}
 {% block page_subtitle %}{{ application.company_name }} - {{ application.job_title }}{% endblock %}
@@ -103,10 +103,10 @@
                     <div class="flex items-center gap-3">
                         <div class="w-20 bg-gray-200 rounded-full h-2.5">
                             <div class="bg-blue-600 h-2.5 rounded-full"
-                                 style="width: {{ item.count|mul:100|div:total_questions }}%"></div>
+                                 style="width: {{ item.percentage }}%"></div>
                         </div>
                         <span class="text-sm font-medium text-gray-600">
-                            {{ item.count|mul:100|div:total_questions|floatformat:1 }}%
+                            {{ item.percentage|floatformat:1 }}%
                         </span>
                     </div>
                 </div>
@@ -168,7 +168,7 @@
                         </div>
                     </div>
                     <div class="text-right space-x-2">
-                        <a href="{% url 'interview_practice' note.pk %}"
+                        <a href="{% url 'interview_practice' application.pk note.pk %}"
                            class="btn btn-outline btn-sm btn-sm">
                             Practice
                         </a>

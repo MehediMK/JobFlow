@@ -518,6 +518,8 @@ def interview_dashboard(request, pk):
     question_type_breakdown = list(interview_notes.values('question_type').annotate(
         count=Count('id')
     ).order_by('question_type'))
+    for item in question_type_breakdown:
+        item['percentage'] = round((item['count'] / total_questions * 100), 1) if total_questions > 0 else 0
 
     context = {
         'application': application,
@@ -526,7 +528,7 @@ def interview_dashboard(request, pk):
         'practiced_questions': practiced_questions,
         'practice_percentage': round((practiced_questions / total_questions * 100) if total_questions > 0 else 0),
         'avg_rating': round(avg_rating, 1),
-        'question_type_breakdown': json.dumps(question_type_breakdown),
+        'question_type_breakdown': question_type_breakdown,
     }
     return render(request, 'tracker/interview_dashboard.html', context)
 
