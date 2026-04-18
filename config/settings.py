@@ -87,6 +87,14 @@ LOGIN_REDIRECT_URL = 'dashboard'
 LOGOUT_REDIRECT_URL = 'landing'
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# for gmail smtp
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+EMAIL_HOST_USER = 'noreply@jobflow.local'
+EMAIL_HOST_PASSWORD = 'your_app_password'
+
 DEFAULT_FROM_EMAIL = 'noreply@jobflow.local'
 
 ENCRYPTION_KEY = base64.urlsafe_b64encode(hashlib.sha256(SECRET_KEY.encode()).digest())
