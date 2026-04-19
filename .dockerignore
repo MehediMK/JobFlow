@@ -1,0 +1,13 @@
+.git
+.github
+venv
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+db.sqlite3
+media
+staticfiles
+.env
+.env.*
+*.log

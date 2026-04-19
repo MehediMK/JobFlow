@@ -96,6 +96,34 @@ python manage.py send_due_reminders
 python manage.py test
 ```
 
+## Docker
+
+Build and run with Docker Compose:
+
+```powershell
+docker compose up --build
+```
+
+The app will be available at `http://127.0.0.1:8000/`.
+
+Notes:
+
+- Docker uses the local `.env` file
+- SQLite remains the default database
+- media and collected static directories are mounted as Docker volumes
+
+## CI/CD
+
+A GitHub Actions workflow is included at `.github/workflows/ci.yml`.
+
+It runs:
+
+- dependency install
+- `python manage.py check`
+- `python manage.py test`
+
+This workflow triggers on pushes to `main`/`master` and on pull requests.
+
 ## Key App Modules
 
 - [tracker/models.py](D:\Mehedi\Django\job_application\tracker\models.py:1): data models for applications, reminders, documents, templates, credentials, interview notes, and activity logs
