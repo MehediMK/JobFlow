@@ -75,9 +75,16 @@
         </nav>
 
         <div class="sidebar-foot">
-            <a href="{% url 'logout' %}" aria-label="Sign out">
-                <span class="nav-icon" aria-hidden="true">Sign Out</span>
-            </a>
+            <form method="post" action="{% url 'logout' %}" class="sidebar-logout-form">
+                {% csrf_token %}
+                <button type="submit" class="sidebar-logout-button" aria-label="Sign out">
+                    <span class="sidebar-logout-mark" aria-hidden="true">SO</span>
+                    <span class="sidebar-logout-copy">
+                        <strong>Sign Out</strong>
+                        <small>End current session</small>
+                    </span>
+                </button>
+            </form>
         </div>
     </aside>
     {% endif %}
